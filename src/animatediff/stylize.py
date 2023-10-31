@@ -253,16 +253,16 @@ def create_config(
         with open(ignore_list) as f:
             black_list = [s.strip() for s in f.readlines()]
 
-    # model_config.prompt_map = get_labels(
-    #     frame_dir=img2img_dir,
-    #     interval=predicte_interval,
-    #     general_threshold=general_threshold,
-    #     character_threshold=character_threshold,
-    #     ignore_tokens=black_list,
-    #     with_confidence=with_confidence,
-    #     is_danbooru_format=is_danbooru_format,
-    #     is_cpu=False,
-    # )
+    model_config.prompt_map = get_labels(
+        frame_dir=img2img_dir,
+        interval=predicte_interval,
+        general_threshold=general_threshold,
+        character_threshold=character_threshold,
+        ignore_tokens=black_list,
+        with_confidence=with_confidence,
+        is_danbooru_format=is_danbooru_format,
+        is_cpu=False,
+    )
     model_config.prompt_map = {}
 
     model_config.head_prompt = ""
@@ -1191,16 +1191,19 @@ def create_mask(
 
     for output, size in output_list:
         # 直接去掉 prompt map，目前看prompt的作用不大
-        # model_config.prompt_map = get_labels(
-        #     frame_dir= output / "00_img2img",
-        #     interval=predicte_interval,
-        #     general_threshold=general_threshold,
-        #     character_threshold=character_threshold,
-        #     ignore_tokens=black_list,
-        #     with_confidence=with_confidence,
-        #     is_danbooru_format=is_danbooru_format,
-        #     is_cpu = False,
-        # )
+        # prompt_map = {} , 会直接导致 generate失败；不能去掉;
+        # 考虑到 目前的场景大量 frame重复，我这里直接把剩余frame 选择为第一帧的frame的prompt
+
+        model_config.prompt_map = get_labels(
+            frame_dir=output / "00_img2img",
+            interval=predicte_interval,
+            general_threshold=general_threshold,
+            character_threshold=character_threshold,
+            ignore_tokens=black_list,
+            with_confidence=with_confidence,
+            is_danbooru_format=is_danbooru_format,
+            is_cpu=False,
+        )
 
         model_config.prompt_map = {}
 
