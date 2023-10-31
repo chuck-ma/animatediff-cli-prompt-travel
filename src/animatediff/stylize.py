@@ -247,7 +247,7 @@ def create_config(
     else:
         shutil.copytree(img2img_dir, controlnet_img_dir.joinpath("controlnet_openpose"), dirs_exist_ok=True)
 
-    shutil.copytree(img2img_dir, controlnet_img_dir.joinpath("controlnet_softedge"), dirs_exist_ok=True)
+    shutil.copytree(img2img_dir, controlnet_img_dir.joinpath("controlnet_depth"), dirs_exist_ok=True)
 
     black_list = []
     if ignore_list.is_file():
@@ -1146,7 +1146,7 @@ def create_mask(
         # 不知道为啥要设置为 ip2p ，我全给改成 depth
         # depth，效果会出问题; 还是改成 soft edge
 
-        shutil.copytree(fg_masked_dir, fg_dir / "00_controlnet_image/controlnet_softedge", dirs_exist_ok=True)
+        shutil.copytree(fg_masked_dir, fg_dir / "00_controlnet_image/controlnet_depth", dirs_exist_ok=True)
 
         if crop_size_hw:
             if crop_size_hw[0] == 0 or crop_size_hw[1] == 0:
