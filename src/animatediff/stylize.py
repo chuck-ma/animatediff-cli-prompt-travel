@@ -263,7 +263,6 @@ def create_config(
         is_danbooru_format=is_danbooru_format,
         is_cpu=False,
     )
-    model_config.prompt_map = {}
 
     model_config.head_prompt = ""
     model_config.tail_prompt = ""
@@ -1205,7 +1204,7 @@ def create_mask(
             is_cpu=False,
         )
 
-        model_config.prompt_map = {}
+        # model_config.prompt_map = {}
 
         model_config.controlnet_map["input_image_dir"] = os.path.relpath(
             (output / "00_controlnet_image").absolute(), data_dir
