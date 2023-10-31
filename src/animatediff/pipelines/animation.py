@@ -2851,7 +2851,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 # logger.info(f"STEP start")
                 stopwatch_record("STEP start")
                 print(
-                    f"context_schedler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}"
+                    f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}"
                 )
 
                 for context in context_scheduler(
