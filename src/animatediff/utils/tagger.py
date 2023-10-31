@@ -151,6 +151,8 @@ def get_labels(
 ):
     import torch
 
+    print("get_labels|frame_dir=", frame_dir)
+
     result = {}
     if os.path.isdir(frame_dir):
         png_list = sorted(glob.glob(os.path.join(frame_dir, "[0-9]*.png"), recursive=False))
