@@ -1,192 +1,188 @@
 {
   "name": "sample",
-  "path": "share/Stable-diffusion/mistoonAnime_v20.safetensors",
-  "motion_module": "models/motion-module/mm_sd_v14.ckpt",
+  "path": "models/sd/mistoonAnime_v20_vae.safetensors",
+  "motion_module": "models/motion-module/mm_sd_v15_v2.ckpt",
   "compile": false,
   "seed": [
-    341774366206100
+    4782744381357496443
   ],
   "scheduler": "k_dpmpp_sde",
   "steps": 20,
   "guidance_scale": 10,
   "clip_skip": 2,
-  "head_prompt": "masterpiece, best quality, a beautiful and detailed portriat of muffet, monster girl,((purple body:1.3)),humanoid, arachnid, anthro,((fangs)),pigtails,hair bows,5 eyes,spider girl,6 arms,solo",
+  "head_prompt": "masterpiece, best quality",
   "prompt_map": {
-    "0":  "smile standing,((spider webs:1.0))",
-    "32":  "(((walking))),((spider webs:1.0))",
-    "64":  "(((running))),((spider webs:2.0)),wide angle lens, fish eye effect",
-    "96":  "(((sitting))),((spider webs:1.0))"
+    "0": "(boots:0.87),(long_sleeves:0.69),(no_humans:0.90),(brown_footwear:0.46),(simple_background:0.79), ((no_girls)), ((no_legs))"
   },
-  "tail_prompt": "clothed, open mouth, awesome and detailed background, holding teapot, holding teacup, 6 hands,detailed hands,storefront that sells pastries and tea,bloomers,(red and black clothing),inside,pouring into teacup,muffetwear",
+  "tail_prompt": "",
   "n_prompt": [
-    "(worst quality, low quality:1.4),nudity,simple background,border,mouth closed,text, patreon,bed,bedroom,white background,((monochrome)),sketch,(pink body:1.4),7 arms,8 arms,4 arms"
+    "(worst quality, low quality:1.4),nudity,text, patreon,sketch"
   ],
   "lora_map": {
-    "share/Lora/muffet_v2.safetensors" : 1.0,
-    "share/Lora/add_detail.safetensors" : 1.0
+    "models/lora/add_detail.safetensors": 1.0
   },
   "ip_adapter_map": {
-      "enable": true,
-      "input_image_dir": "ip_adapter_image/test",
-      "save_input_image": true,
-      "resized_to_square": false,
-      "scale": 0.5,
-      "is_plus_face": true,
-      "is_plus": true
+    "enable": true,
+    "input_image_dir": "ip_adapter_image/test",
+    "save_input_image": true,
+    "resized_to_square": false,
+    "scale": 0.5,
+    "prompt_fixed_ratio": 0.5,
+    "is_plus_face": false,
+    "is_plus": true
   },
   "controlnet_map": {
-    "input_image_dir" : "controlnet_image/test",
+    "input_image_dir": "controlnet_image/test",
     "max_samples_on_vram": 200,
-    "max_models_on_vram" : 3,
+    "max_models_on_vram": 3,
     "save_detectmap": true,
     "preprocess_on_gpu": true,
     "is_loop": true,
-    
-    "controlnet_tile":{
+    "controlnet_tile": {
       "enable": true,
-      "use_preprocessor":true,
-      "preprocessor":{
-        "type" : "none",
-        "param":{
-        }
+      "use_preprocessor": true,
+      "preprocessor": {
+        "type": "none",
+        "param": {}
       },
-      "guess_mode":false,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
-    "controlnet_ip2p":{
+    "controlnet_ip2p": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
-    "controlnet_lineart_anime":{
+    "controlnet_lineart_anime": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
-    "controlnet_openpose":{
+    "controlnet_openpose": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
-    "controlnet_softedge":{
+    "controlnet_softedge": {
       "enable": true,
-      "use_preprocessor":true,
-      "preprocessor":{
-        "type" : "softedge_pidsafe",
-        "param":{
-        }
+      "use_preprocessor": true,
+      "preprocessor": {
+        "type": "softedge_pidsafe",
+        "param": {}
       },
-      "guess_mode":false,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_shuffle": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_depth": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_canny": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_inpaint": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_lineart": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_mlsd": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_normalbae": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_scribble": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_seg": {
       "enable": true,
-      "use_preprocessor":true,
-      "guess_mode":false,
+      "use_preprocessor": true,
+      "guess_mode": false,
       "controlnet_conditioning_scale": 1.0,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
-      "control_scale_list":[0.5,0.4,0.3,0.2,0.1]
+      "control_scale_list": []
     },
     "controlnet_ref": {
-        "enable": false,
-        "ref_image": "ref_image/ref_sample.png",
-        "attention_auto_machine_weight": 0.3,
-        "gn_auto_machine_weight": 0.3,
-        "style_fidelity": 0.5,
-        "reference_attn": true,
-        "reference_adain": false,
-        "scale_pattern":[1.0]
+      "enable": false,
+      "ref_image": "ref_image/ref_sample.png",
+      "attention_auto_machine_weight": 0.3,
+      "gn_auto_machine_weight": 0.3,
+      "style_fidelity": 0.5,
+      "reference_attn": true,
+      "reference_adain": false,
+      "scale_pattern": [
+        1.0
+      ]
     }
   },
   "upscale_config": {
@@ -227,10 +223,10 @@
       "reference_adain": false
     }
   },
-  "output":{
-    "format" : "gif",
-    "fps" : 8,
-    "encode_param":{
+  "output": {
+    "format": "mp4",
+    "fps": 8,
+    "encode_param": {
       "crf": 10
     }
   }
