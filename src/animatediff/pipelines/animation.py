@@ -2850,13 +2850,17 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 # logger.info(f"STEP start")
                 stopwatch_record("STEP start")
-                print(
-                    f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}"
-                )
+                # latents.shape[2] 为 frame length
+                # context_scheduler|i=0, num_inference_steps=20, shape=torch.Size([1, 4, 60, 96,
+                # 64]),context_frames=32, context_stride=1, context_overlap=8
 
                 for context in context_scheduler(
                     i, num_inference_steps, latents.shape[2], context_frames, context_stride, context_overlap
                 ):
+                    print(
+                        f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}, context={context}"
+                    )
+
                     if controlnet_image_map:
                         controlnet_target = (
                             list(range(context[0] - context_frames, context[0]))
