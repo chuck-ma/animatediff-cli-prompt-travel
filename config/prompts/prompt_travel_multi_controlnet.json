@@ -4,7 +4,7 @@
   "motion_module": "models/motion-module/mm_sd_v15_v2.ckpt",
   "compile": false,
   "seed": [
-    4782744381357496443
+    478274438135749644
   ],
   "scheduler": "k_dpmpp_sde",
   "steps": 20,
@@ -12,11 +12,11 @@
   "clip_skip": 2,
   "head_prompt": "masterpiece, best quality",
   "prompt_map": {
-    "0": "(boots:0.87),(long_sleeves:0.69),(no_humans:0.90),(brown_footwear:0.46),(simple_background:0.79), ((no_girls)), ((no_legs))"
+    "0": "(orange boots:0.87), (no_humans:0.90),(brown_footwear:0.46),(simple_background:0.79), ((no_girls)), ((no_legs)), ((no_hands))"
   },
   "tail_prompt": "",
   "n_prompt": [
-    "(worst quality, low quality:1.4),nudity,text, patreon,sketch"
+    "(worst quality, low quality:1.4),nudity,text, patreon,sketch, hands"
   ],
   "lora_map": {
     "models/lora/add_detail.safetensors": 1.0
