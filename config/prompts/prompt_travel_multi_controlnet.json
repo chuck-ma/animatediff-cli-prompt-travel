@@ -3,16 +3,17 @@
   "path": "models/sd/mistoonAnime_v20_vae.safetensors",
   "motion_module": "models/motion-module/mm_sd_v15_v2.ckpt",
   "compile": false,
+  "tensor_interpolation_slerp": true,
   "seed": [
-    478274438135749644
+    -1
   ],
   "scheduler": "k_dpmpp_sde",
   "steps": 20,
   "guidance_scale": 10,
   "clip_skip": 2,
-  "head_prompt": "masterpiece, best quality",
+  "head_prompt": "masterpiece, best quality, ((boots)), ((no_humans)),(simple_background:0.79), ((no_girls)), ((no_legs)), ((no_hands)), ((no heads))",
   "prompt_map": {
-    "0": "(orange boots:0.87), (no_humans:0.90),(brown_footwear:0.46),(simple_background:0.79), ((no_girls)), ((no_legs)), ((no_hands))"
+    "0": ""
   },
   "tail_prompt": "",
   "n_prompt": [
@@ -32,7 +33,7 @@
     "is_plus": true
   },
   "controlnet_map": {
-    "input_image_dir": "controlnet_image/video",
+    "input_image_dir": "controlnet_image/test",
     "max_samples_on_vram": 200,
     "max_models_on_vram": 3,
     "save_detectmap": true,
@@ -46,7 +47,7 @@
         "param": {}
       },
       "guess_mode": false,
-      "controlnet_conditioning_scale": 1.0,
+      "controlnet_conditioning_scale": 0.5,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
       "control_scale_list": []
@@ -86,7 +87,7 @@
         "param": {}
       },
       "guess_mode": false,
-      "controlnet_conditioning_scale": 1.0,
+      "controlnet_conditioning_scale": 0.8,
       "control_guidance_start": 0.0,
       "control_guidance_end": 1.0,
       "control_scale_list": []

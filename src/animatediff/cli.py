@@ -309,6 +309,11 @@ def generate(
     is_v2 = is_v2_motion_module(data_dir.joinpath(model_config.motion_module))
     infer_config: InferenceConfig = get_infer_config(is_v2)
 
+    # 设置是线性插值还是球形插值
+    # 球面线性插值（Spherical Linear Interpolation，简称SLERP）是一种特殊的插值方法，
+    # 在需要插值单位四元数或单位向量时尤其有用。
+    # 在关键帧动画中，使用SLERP可以确保旋转的连续性和平滑性，因为它在球面上以恒定速度插值。
+
     set_tensor_interpolation_method(model_config.tensor_interpolation_slerp)
 
     # set sane defaults for context, overlap, and stride if not supplied
@@ -423,6 +428,17 @@ def generate(
                 context_frames=context,
                 context_overlap=overlap,
                 context_stride=stride,
+                # 阅读get_unweighted_text_embeddings 和
+                # get_weighted_text_embeddings 可以得到更详细的相关代码的理解
+                # 简单来说, get_unweighted_text_embeddings函数负责将文本输入分成多个块，并将每个块单独传递给文本编码器。
+                # 这是在处理长文本序列时常见的做法，因为文本编码器通常有一个最大长度限制。
+                # 在这个函数中，clip_skip参数被用于控制如何处理每个文本块。
+                # 当文本编码器是CLIPSkipTextModel的实例时，clip_skip参数会被直接传递给文本编码器。
+                # 这表明CLIPSkipTextModel是一个特殊类型的文本编码器，它可以接受clip_skip参数来调整其行为。
+                # 从函数的上下文来看，clip_skip可能控制在将文本块传递给文本编码器时跳过的标记（token）数量。
+                # 例如，如果clip_skip为1，则可能不跳过任何标记；
+                # 如果clip_skip大于1，则在将文本块传递给编码器时，可能会跳过一些标记。
+                # 这可以用来减少计算量，特别是在处理非常长的文本序列时。
                 clip_skip=model_config.clip_skip,
                 controlnet_map=model_config.controlnet_map,
                 controlnet_image_map=controlnet_image_map,
