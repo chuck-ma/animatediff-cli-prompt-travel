@@ -2617,6 +2617,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
         # 7. Denoising loop
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         with self.progress_bar(total=total_steps) as progress_bar:
+            print("getting timesteps=", timesteps)
             for i, t in enumerate(timesteps):
                 stopwatch_start()
 
