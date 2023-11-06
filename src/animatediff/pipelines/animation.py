@@ -2856,13 +2856,15 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 # logger.info(f"STEP start")
                 stopwatch_record("STEP start")
-                # latents.shape[2] 为 frame length
-                # context_scheduler|i=0, num_inference_steps=20, shape=torch.Size([1, 4, 60, 96,
-                # 64]),context_frames=32, context_stride=1, context_overlap=8
 
                 for context in context_scheduler(
                     i, num_inference_steps, latents.shape[2], context_frames, context_stride, context_overlap
                 ):
+                    # latents.shape[2] 为 frame length
+                    # context_scheduler|i=0, num_inference_steps=20, shape=torch.Size([1, 4, 16, 48, 32])
+                    # ,context_frames=16, context_stride=1, context_overlap=4
+                    # context 为 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
                     print(
                         f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}, context={context}"
                     )
@@ -2879,6 +2881,10 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                         process_controlnet(controlnet_target)
 
                     # expand the latents if we are doing classifier free guidance
+                    # prompt_encoder.get_condi_size() 应该为2
+                    # 下面那个repeat之后， latent_model_input.shape = torch.Size([2, 4, 16, 48, 32])
+                    # 则第一维被 copy 的次数为 2
+
                     latent_model_input = (
                         latents[:, :, context].to(device).repeat(prompt_encoder.get_condi_size(), 1, 1, 1, 1)
                     )
@@ -2931,6 +2937,11 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                     for layer_index in range(0, latent_model_input.shape[0], unet_batch_size):
                         # 先搞清楚这部分代码是在作甚
+                        # 看起来因为是 classifier free guidance, 所以 latent_model_input.shape[0] = 2
+                        # 所以这里做了两次 inference
+
+                        # layer_index= 0 |shape= torch.Size([2, 4, 16, 48, 32]) |unet_batch_size= 1
+                        # layer_index= 1 |shape= torch.Size([2, 4, 16, 48, 32]) |unet_batch_size= 1
                         print(
                             "layer_index=",
                             layer_index,
@@ -2941,13 +2952,26 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                         )
                         __do = []
                         if down_block_res_samples is not None:
+                            print(
+                                "layer_index=",
+                                layer_index,
+                                "|down_block_res_samples=",
+                                down_block_res_samples.shape,
+                            )
                             for do in down_block_res_samples:
                                 __do.append(do[layer_index : layer_index + unet_batch_size])
+                                print("layer_index=", layer_index, "|__do=", do.shape)
                         else:
                             __do = None
 
                         __mid = None
                         if mid_block_res_sample is not None:
+                            print(
+                                "layer_index=",
+                                layer_index,
+                                "|mid_block_res_sample=",
+                                mid_block_res_sample.shape,
+                            )
                             __mid = mid_block_res_sample[layer_index : layer_index + unet_batch_size]
 
                         __lat = latent_model_input[layer_index : layer_index + unet_batch_size]
