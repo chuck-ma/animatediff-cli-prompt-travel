@@ -2994,6 +2994,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                     pred = torch.cat(__pred)
 
                     stopwatch_record("normal unet end")
+                    print("pred.shape=", pred.shape)
 
                     pred = pred.to(dtype=latents.dtype, device=latents.device)
                     noise_pred[:, :, context] = noise_pred[:, :, context] + pred
@@ -3002,6 +3003,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 # perform guidance
                 noise_size = prompt_encoder.get_condi_size()
+                print("noise_size=", noise_size)
                 if do_classifier_free_guidance:
                     noise_pred = noise_pred / counter
                     noise_list = list(noise_pred.chunk(noise_size))
