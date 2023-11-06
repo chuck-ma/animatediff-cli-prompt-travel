@@ -2618,6 +2618,11 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
         num_warmup_steps = len(timesteps) - num_inference_steps * self.scheduler.order
         with self.progress_bar(total=total_steps) as progress_bar:
             print("getting timesteps=", timesteps)
+            # tensor([999, 960, 918, 873, 823, 770, 710, 645, 572, 492,
+            # 404, 313, 225, 147,
+            # 87,  45,  20,   8,   2,   0]
+            # timesteps的 len为20，对应的其实是 20个 steps
+
             for i, t in enumerate(timesteps):
                 stopwatch_start()
 
@@ -2925,6 +2930,15 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                     __pred = []
 
                     for layer_index in range(0, latent_model_input.shape[0], unet_batch_size):
+                        # 先搞清楚这部分代码是在作甚
+                        print(
+                            "layer_index=",
+                            layer_index,
+                            "|shape=",
+                            latent_model_input.shape,
+                            "|unet_batch_size=",
+                            unet_batch_size,
+                        )
                         __do = []
                         if down_block_res_samples is not None:
                             for do in down_block_res_samples:

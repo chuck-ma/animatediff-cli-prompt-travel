@@ -27,7 +27,7 @@
     "input_image_dir": "ip_adapter_image/test",
     "save_input_image": true,
     "resized_to_square": false,
-    "scale": 0.5,
+    "scale": 1.0,
     "prompt_fixed_ratio": 0.5,
     "is_plus_face": false,
     "is_plus": true
