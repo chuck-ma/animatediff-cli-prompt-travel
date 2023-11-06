@@ -2942,36 +2942,50 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                         # layer_index= 0 |shape= torch.Size([2, 4, 16, 48, 32]) |unet_batch_size= 1
                         # layer_index= 1 |shape= torch.Size([2, 4, 16, 48, 32]) |unet_batch_size= 1
-                        print(
-                            "layer_index=",
-                            layer_index,
-                            "|shape=",
-                            latent_model_input.shape,
-                            "|unet_batch_size=",
-                            unet_batch_size,
-                        )
+                        # print(
+                        #     "layer_index=",
+                        #     layer_index,
+                        #     "|shape=",
+                        #     latent_model_input.shape,
+                        #     "|unet_batch_size=",
+                        #     unet_batch_size,
+                        # )
                         __do = []
                         if down_block_res_samples is not None:
-                            print(
-                                "layer_index=",
-                                layer_index,
-                                "|down_block_res_samples=",
-                                len(down_block_res_samples),
-                            )
+                            # layer_index= 0 |down_block_res_samples= 12
+                            # print(
+                            #     "layer_index=",
+                            #     layer_index,
+                            #     "|down_block_res_samples=",
+                            #     len(down_block_res_samples),
+                            # )
                             for do in down_block_res_samples:
                                 __do.append(do[layer_index : layer_index + unet_batch_size])
-                                print("layer_index=", layer_index, "|__do=", do.shape)
+                                # layer_index= 0 |__do= torch.Size([2, 320, 16, 48, 32])
+                                # layer_index= 0 |__do= torch.Size([2, 320, 16, 48, 32])
+                                # layer_index= 0 |__do= torch.Size([2, 320, 16, 48, 32])
+                                # layer_index= 0 |__do= torch.Size([2, 320, 16, 24, 16])
+                                # layer_index= 0 |__do= torch.Size([2, 640, 16, 24, 16])
+                                # layer_index= 0 |__do= torch.Size([2, 640, 16, 24, 16])
+                                # layer_index= 0 |__do= torch.Size([2, 640, 16, 12, 8])
+                                # layer_index= 0 |__do= torch.Size([2, 1280, 16, 12, 8])
+                                # layer_index= 0 |__do= torch.Size([2, 1280, 16, 12, 8])
+                                # layer_index= 0 |__do= torch.Size([2, 1280, 16, 6, 4])
+                                # layer_index= 0 |__do= torch.Size([2, 1280, 16, 6, 4])
+                                # layer_index= 0 |__do= torch.Size([2, 1280, 16, 6, 4])
+                                # print("layer_index=", layer_index, "|__do=", do.shape)
                         else:
                             __do = None
 
                         __mid = None
                         if mid_block_res_sample is not None:
-                            print(
-                                "layer_index=",
-                                layer_index,
-                                "|mid_block_res_sample=",
-                                len(mid_block_res_sample),
-                            )
+                            # layer_index= 0 |mid_block_res_sample= 2
+                            # print(
+                            #     "layer_index=",
+                            #     layer_index,
+                            #     "|mid_block_res_sample=",
+                            #     len(mid_block_res_sample),
+                            # )
                             __mid = mid_block_res_sample[layer_index : layer_index + unet_batch_size]
 
                         __lat = latent_model_input[layer_index : layer_index + unet_batch_size]
@@ -2994,7 +3008,8 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                     pred = torch.cat(__pred)
 
                     stopwatch_record("normal unet end")
-                    print("pred.shape=", pred.shape)
+                    # pred.shape= torch.Size([2, 4, 16, 48, 32])
+                    # print("pred.shape=", pred.shape)
 
                     pred = pred.to(dtype=latents.dtype, device=latents.device)
                     noise_pred[:, :, context] = noise_pred[:, :, context] + pred
@@ -3003,7 +3018,8 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 # perform guidance
                 noise_size = prompt_encoder.get_condi_size()
-                print("noise_size=", noise_size)
+                # noise_size= 2
+                # print("noise_size=", noise_size)
                 if do_classifier_free_guidance:
                     noise_pred = noise_pred / counter
                     noise_list = list(noise_pred.chunk(noise_size))
@@ -3027,6 +3043,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 latents_list = latents.chunk(noise_size)
 
                 tmp_latent = torch.zeros(latents_list[0].shape, device=latents.device, dtype=latents.dtype)
+                print("region_list_len=", len(region_list), "|noise_size=", noise_size, "|")
 
                 for r_no in range(len(region_list)):
                     mask = region_mask.get_mask(r_no)
