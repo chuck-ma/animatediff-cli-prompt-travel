@@ -2956,7 +2956,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                                 "layer_index=",
                                 layer_index,
                                 "|down_block_res_samples=",
-                                down_block_res_samples.shape,
+                                len(down_block_res_samples),
                             )
                             for do in down_block_res_samples:
                                 __do.append(do[layer_index : layer_index + unet_batch_size])
@@ -2970,7 +2970,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                                 "layer_index=",
                                 layer_index,
                                 "|mid_block_res_sample=",
-                                mid_block_res_sample.shape,
+                                len(mid_block_res_sample),
                             )
                             __mid = mid_block_res_sample[layer_index : layer_index + unet_batch_size]
 
