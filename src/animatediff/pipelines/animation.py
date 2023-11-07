@@ -3043,13 +3043,22 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 latents_list = latents.chunk(noise_size)
 
                 tmp_latent = torch.zeros(latents_list[0].shape, device=latents.device, dtype=latents.dtype)
+
+                def check_all_ones(tensor):
+                    # We can use torch.all() to check if all elements are True after comparing them with 1
+                    return torch.all(tensor == 1).item()
+
+                # region_list_len= 1 |noise_size= 1 |region_list= [{'mask_images': None, 'src': 0,
+                # 'mask_latents': tensor([[[[[1., 1., 1.,  ..., 1., 1., 1.], ...}]
+
                 print(
                     "region_list_len=",
                     len(region_list),
                     "|noise_size=",
                     noise_size,
                     "|region_list=",
-                    region_list,
+                    check_all_ones(region_list[0]["mask_latents"]),
+                    # region_list,
                 )
 
                 for r_no in range(len(region_list)):
