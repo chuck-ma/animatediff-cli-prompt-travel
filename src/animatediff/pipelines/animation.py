@@ -52,6 +52,34 @@ from animatediff.utils.util import (
     stopwatch_stop,
 )
 
+import torchvision.transforms as transforms
+
+# from PIL import Image
+import os
+
+# Assuming 'video' is the output tensor from the 'decode_latents' function you provided
+# Here's a function that will convert the video frames into images and save them to disk
+
+
+def save_video_frames_as_images(video: torch.Tensor, output_dir: str):
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Define a transform to convert tensors to PIL images
+    to_pil_image = transforms.ToPILImage()
+
+    # Loop through each frame in the video tensor
+    for frame_idx in range(video.shape[2]):  # Accessing the 'f' dimension which is at index 2
+        # Extract the frame from the video tensor
+        frame = video[:, :, frame_idx, :, :]
+
+        # Convert the frame to a PIL image
+        pil_image = to_pil_image(frame)
+
+        # Save the frame as an image file
+        pil_image.save(os.path.join(output_dir, f"frame_{frame_idx:04d}.png"))
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -3044,22 +3072,24 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 tmp_latent = torch.zeros(latents_list[0].shape, device=latents.device, dtype=latents.dtype)
 
-                def check_all_ones(tensor):
-                    # We can use torch.all() to check if all elements are True after comparing them with 1
-                    return torch.all(tensor == 1).item()
+                # def check_all_ones(tensor):
+                #     # We can use torch.all() to check if all elements are True after comparing them with 1
+                #     return torch.all(tensor == 1).item()
 
                 # region_list_len= 1 |noise_size= 1 |region_list= [{'mask_images': None, 'src': 0,
                 # 'mask_latents': tensor([[[[[1., 1., 1.,  ..., 1., 1., 1.], ...}]
 
-                print(
-                    "region_list_len=",
-                    len(region_list),
-                    "|noise_size=",
-                    noise_size,
-                    "|region_list=",
-                    check_all_ones(region_list[0]["mask_latents"]),
-                    # region_list,
-                )
+                # print(
+                #     "region_list_len=",
+                #     len(region_list),
+                #     "|noise_size=",
+                #     noise_size,
+                #     "|region_list=",
+                #     check_all_ones(region_list[0]["mask_latents"]),
+                #     # region_list,
+                # )
+
+                # check_all_ones(region_list[0]["mask_latents"]) 的值全为 True
 
                 for r_no in range(len(region_list)):
                     mask = region_mask.get_mask(r_no)
@@ -3079,6 +3109,9 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                     tmp_latent = tmp_latent * (1 - mask) + lat * mask
 
+                # 在不使用 region 功能的时候, tmp_latent = latents
+                # 所以下面这样的赋值对于 latents而言，没有任何影响
+
                 latents = tmp_latent
 
                 init_latents_proper = None
@@ -3092,6 +3125,10 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 ):
                     if callback is not None and i % callback_steps == 0:
                         callback(i, t, latents)
+
+                temp_video = self.decode_latents(latents)
+                output_directory = f"./output_tmp/{t}"
+                save_video_frames_as_images(temp_video, output_directory)
 
                 stopwatch_stop("LOOP end")
 
