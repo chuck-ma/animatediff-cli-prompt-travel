@@ -3130,7 +3130,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 temp_video = self.decode_latents(latents)
                 output_directory = f"./output_tmp/{t}"
-                save_frames(temp_video, output_directory)
+                save_frames(temp_video, output_directory, False)
 
                 stopwatch_stop("LOOP end")
 
