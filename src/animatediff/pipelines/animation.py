@@ -60,29 +60,26 @@ import os
 # Assuming 'video' is the output tensor from the 'decode_latents' function you provided
 # Here's a function that will convert the video frames into images and save them to disk
 
+from torchvision.utils import save_image
+from tqdm.rich import tqdm
+from torch import Tensor
+from os import PathLike
+from pathlib import Path
 
-def save_video_frames_as_images(video: torch.Tensor, output_dir: str):
-    # Create the output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
+logger = logging.getLogger(__name__)
 
-    # Define a transform to convert tensors to PIL images
-    to_pil_image = transforms.ToPILImage()
 
-    # Loop through each frame in the video tensor
-    for frame_idx in range(video.shape[2]):  # Accessing the 'f' dimension which is at index 2
-        # Extract the frame from the video tensor
-        # video[:, :, frame_idx, :, :] 得到 shape (1, 3, 512, 512)
-
-        # squeeze之后应该是 (3, 512, 512)
-        frame = video[:, :, frame_idx, :, :].squeeze(0)
-
-        print("frame_origin_shape=", video[:, :, frame_idx, :, :].shape, "|frame_shape=", frame.shape)
-
-        # Convert the frame to a PIL image
-        pil_image = to_pil_image(frame)
-
-        # Save the frame as an image file
-        pil_image.save(os.path.join(output_dir, f"frame_{frame_idx:04d}.png"))
+def save_frames(video: Tensor, frames_dir: PathLike, show_progress: bool = True):
+    print("starting save frames...")
+    frames_dir = Path(frames_dir)
+    frames_dir.mkdir(parents=True, exist_ok=True)
+    frames = rearrange(video, "b c t h w -> t b c h w")
+    if show_progress:
+        for idx, frame in enumerate(tqdm(frames, desc=f"Saving frames to {frames_dir.stem}")):
+            save_image(frame, frames_dir.joinpath(f"{idx:08d}.png"))
+    else:
+        for idx, frame in enumerate(frames):
+            save_image(frame, frames_dir.joinpath(f"{idx:08d}.png"))
 
 
 logger = logging.getLogger(__name__)
@@ -3133,7 +3130,7 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
                 temp_video = self.decode_latents(latents)
                 output_directory = f"./output_tmp/{t}"
-                save_video_frames_as_images(temp_video, output_directory)
+                save_frames(temp_video, output_directory)
 
                 stopwatch_stop("LOOP end")
 
