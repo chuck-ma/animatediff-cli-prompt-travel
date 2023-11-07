@@ -71,8 +71,12 @@ def save_video_frames_as_images(video: torch.Tensor, output_dir: str):
     # Loop through each frame in the video tensor
     for frame_idx in range(video.shape[2]):  # Accessing the 'f' dimension which is at index 2
         # Extract the frame from the video tensor
-        print("frame_shape=", video[:, :, frame_idx, :, :].shape)
+        # video[:, :, frame_idx, :, :] 得到 shape (1, 3, 512, 512)
+
+        # squeeze之后应该是 (3, 512, 512)
         frame = video[:, :, frame_idx, :, :].squeeze(0)
+
+        print("frame_origin_shape=", video[:, :, frame_idx, :, :].shape, "|frame_shape=", frame.shape)
 
         # Convert the frame to a PIL image
         pil_image = to_pil_image(frame)
