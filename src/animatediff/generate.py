@@ -1166,6 +1166,15 @@ def run_inference(
     logger.info(f"{len( region_list )=}")
     #    logger.info(f"{region_list=}")
 
+    print(
+        f"controlnet_image_map={controlnet_image_map}|controlnet_type_map={controlnet_type_map}",
+        f"controlnet_ref_map={controlnet_ref_map}",
+        f"img2img_map={img2img_map}",
+        f"ip_adapter_config_map={ip_adapter_config_map}",
+        f"region_list={region_list}",
+        f"region_condi_list={region_condi_list}",
+    )
+
     pipeline_output = pipeline(
         negative_prompt=n_prompt,
         num_inference_steps=steps,
@@ -1210,7 +1219,7 @@ def run_inference(
     prompt_str = "_".join((prompt_tags[:6]))[:50]
 
     frame_dir = out_dir.joinpath(f"{idx:02d}-{seed}")
-    print("will save to frame_dir:", frame_dir, "|save_frames=", save_frames)
+    # print("will save to frame_dir:", frame_dir, "|save_frames=", save_frames)
     out_file = out_dir.joinpath(f"{idx:02d}_{seed}_{prompt_str}")
 
     save_output(pipeline_output, frame_dir, out_file, output_map, no_frames, save_frames, save_video)
