@@ -69,8 +69,12 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-def save_frames(video: Tensor, frames_dir: PathLike, show_progress: bool = True):
+def save_frames(video, frames_dir: PathLike, show_progress: bool = True):
     print("starting save frames...")
+
+    # 看代码 video 是 numpy 类型，先转一下
+
+    video = torch.from_numpy(video)
     frames_dir = Path(frames_dir)
     frames_dir.mkdir(parents=True, exist_ok=True)
     frames = rearrange(video, "b c t h w -> t b c h w")
