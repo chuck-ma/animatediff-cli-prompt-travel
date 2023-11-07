@@ -3043,7 +3043,14 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 latents_list = latents.chunk(noise_size)
 
                 tmp_latent = torch.zeros(latents_list[0].shape, device=latents.device, dtype=latents.dtype)
-                print("region_list_len=", len(region_list), "|noise_size=", noise_size, "|")
+                print(
+                    "region_list_len=",
+                    len(region_list),
+                    "|noise_size=",
+                    noise_size,
+                    "|region_list=",
+                    region_list,
+                )
 
                 for r_no in range(len(region_list)):
                     mask = region_mask.get_mask(r_no)
