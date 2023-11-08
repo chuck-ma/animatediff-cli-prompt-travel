@@ -60,30 +60,11 @@ import os
 # Assuming 'video' is the output tensor from the 'decode_latents' function you provided
 # Here's a function that will convert the video frames into images and save them to disk
 
-from torchvision.utils import save_image
 from tqdm.rich import tqdm
-from torch import Tensor
-from os import PathLike
-from pathlib import Path
 
-logger = logging.getLogger(__name__)
-
-
-def save_frames(video, frames_dir: PathLike, show_progress: bool = True):
-    print("starting save frames...")
-
-    # 看代码 video 是 numpy 类型，先转一下
-
-    video = torch.from_numpy(video)
-    frames_dir = Path(frames_dir)
-    frames_dir.mkdir(parents=True, exist_ok=True)
-    frames = rearrange(video, "b c t h w -> t b c h w")
-    if show_progress:
-        for idx, frame in enumerate(tqdm(frames, desc=f"Saving frames to {frames_dir.stem}")):
-            save_image(frame, frames_dir.joinpath(f"{idx:08d}.png"))
-    else:
-        for idx, frame in enumerate(frames):
-            save_image(frame, frames_dir.joinpath(f"{idx:08d}.png"))
+# from torch import Tensor
+# from os import PathLike
+# from pathlib import Path
 
 
 logger = logging.getLogger(__name__)
@@ -2338,6 +2319,16 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
 
         sequential_mode = video_length is not None and video_length > context_frames
 
+        # Ensure video_length and context_frames are equal and set to 16 for spatio-temporal consistency
+        if video_length != context_frames:
+            raise ValueError(
+                "video_length and context_frames must be equal and set to 16 for spatio-temporal consistency"
+            )
+        if video_length != 16 or context_frames != 16:
+            raise ValueError(
+                "video_length and context_frames must be set to 16 for spatio-temporal consistency"
+            )
+
         # 1. Check inputs. Raise error if not correct
         self.check_inputs(
             "dummy string",
@@ -3126,15 +3117,14 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                 tmp_latent = None
 
                 # call the callback, if provided
-                if i == len(timesteps) - 1 or (
-                    (i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0
-                ):
-                    if callback is not None and i % callback_steps == 0:
-                        callback(i, t, latents)
+                # if i == len(timesteps) - 1 or (
+                #     (i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0
+                # ):
+                #     if callback is not None and i % callback_steps == 0:
+                #         callback(i, t, latents)
 
-                temp_video = self.decode_latents(latents)
-                output_directory = f"./output_tmp/{t}"
-                save_frames(temp_video, output_directory, False)
+                if callback is not None and i % callback_steps == 0:
+                    callback(i, t, latents)
 
                 stopwatch_stop("LOOP end")
 

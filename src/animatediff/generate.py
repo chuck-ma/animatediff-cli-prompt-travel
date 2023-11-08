@@ -34,7 +34,7 @@ from animatediff import get_dir
 from animatediff.dwpose import DWposeDetector
 from animatediff.models.clip import CLIPSkipTextModel
 from animatediff.models.unet import UNet3DConditionModel
-from animatediff.pipelines import AnimationPipeline, load_text_embeddings
+from animatediff.pipelines import AnimationPipeline, load_text_embeddings, AnimationPipelineOutput
 from animatediff.pipelines.pipeline_controlnet_img2img_reference import (
     StableDiffusionControlNetImg2ImgReferencePipeline,
 )
@@ -55,6 +55,8 @@ from animatediff.utils.util import (
     save_imgs,
     save_video,
 )
+from functools import partial
+
 
 try:
     import onnxruntime
@@ -1166,46 +1168,193 @@ def run_inference(
     logger.info(f"{len( region_list )=}")
     #    logger.info(f"{region_list=}")
 
-    print(
-        f"controlnet_image_map={controlnet_image_map}|controlnet_type_map={controlnet_type_map}",
-        f"controlnet_ref_map={controlnet_ref_map}",
-        f"img2img_map={img2img_map}",
-        f"ip_adapter_config_map={ip_adapter_config_map}",
-        f"region_list={region_list}",
-        f"region_condi_list={region_condi_list}",
+    # print(
+    #     f"controlnet_image_map={controlnet_image_map}|controlnet_type_map={controlnet_type_map}",
+    #     f"controlnet_ref_map={controlnet_ref_map}",
+    #     f"img2img_map={img2img_map}",
+    #     f"ip_adapter_config_map={ip_adapter_config_map}",
+    #     f"region_list={region_list}",
+    #     f"region_condi_list={region_condi_list}",
+    # )
+
+    # controlnet_image_map={0: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4AF0>}, 1: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4F40>}, 2: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4F10>}, 3: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D45B0>}, 4: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D42B0>}, 5: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4B50>}, 6: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4C40>}, 7: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D5480>}, 8: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4D90>}, 9: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4FA0>}, 10: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4610>}, 11: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4460>}, 12: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4EB0>}, 13: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D59F0>}, 14: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D44F0>}, 15: {'controlnet_scribble': <PIL.Image.Image image mode=RGB size=512x512 at 0x7F4DF56D4130>}}
+
+    # controlnet_type_map={'controlnet_scribble': {'controlnet_conditioning_scale': 1.0, 'control_guidance_start': 0.0, 'control_guidance_end': 1.0, 'control_scale_list': [], 'guess_mode': False}}
+
+    # region_list=[{'mask_images': None, 'src': 0}]
+    # region_condi_list=[{'prompt_map': {0: 'masterpiece, best quality, ((boots)), ((no_humans)),(simple_background:0.79), ((no_girls)), ((no_legs)), ((no_hands)), ((no heads)),', 8: 'masterpiece, best quality, ((boots)), ((no_humans)),(simple_background:0.79), ((no_girls)), ((no_legs)), ((no_hands)), ((no heads)),'}, 'ip_adapter_map': None}]
+
+    # 先不管 img2img_map 和 ip_adapter_config_map 这样的实现了
+
+    # 简便起见， 直接把 region_condi_list 的 key都做一个 copy and paste
+    latents_cache = {}
+
+    controlnet_image_maps, overlaps = segment_dict(
+        controlnet_image_map, segment_size=context_frames, overlap=1
     )
 
-    pipeline_output = pipeline(
-        negative_prompt=n_prompt,
-        num_inference_steps=steps,
-        guidance_scale=guidance_scale,
-        unet_batch_size=unet_batch_size,
-        width=width,
-        height=height,
-        video_length=duration,
-        return_dict=False,
-        context_frames=context_frames,
-        context_stride=context_stride + 1,
-        context_overlap=context_overlap,
-        context_schedule=context_schedule,
-        clip_skip=clip_skip,
-        controlnet_type_map=controlnet_type_map,
-        controlnet_image_map=controlnet_image_map,
-        controlnet_ref_map=controlnet_ref_map,
-        controlnet_max_samples_on_vram=controlnet_map["max_samples_on_vram"]
-        if "max_samples_on_vram" in controlnet_map
-        else 999,
-        controlnet_max_models_on_vram=controlnet_map["max_models_on_vram"]
-        if "max_models_on_vram" in controlnet_map
-        else 99,
-        controlnet_is_loop=controlnet_map["is_loop"] if "is_loop" in controlnet_map else True,
-        img2img_map=img2img_map,
-        ip_adapter_config_map=ip_adapter_config_map,
-        region_list=region_list,
-        region_condi_list=region_condi_list,
-        interpolation_factor=1,
-        is_single_prompt_mode=is_single_prompt_mode,
-    )
+    def example_callback(idx, iteration, t, latents):
+        # 确保 idx 存在于 latents_cache
+        if idx not in latents_cache:
+            latents_cache[idx] = {}
+        latents_cache[idx][iteration] = latents
+        temp_video = pipeline.decode_latents(latents)
+
+        # 看代码 video 是 numpy 类型，先转一下
+        temp_video_res = torch.from_numpy(temp_video)
+        output_directory = f"./output_tmp2/{iteration}_{t}"
+        save_frames(temp_video_res, output_directory, False)
+
+        if idx > 0:
+            for i, _ in enumerate(overlaps[idx]):
+                last_latents = latents_cache[idx - 1][iteration]
+                last_idx = latents.shape[2] - len(overlaps[idx]) + i
+                latents[:, :, i, :, :] = last_latents[:, :, last_idx, :, :]
+
+    def segment_dict(dictionary, segment_size=16, overlap=1):
+        """
+        分段给定字典，每段大小为segment_size，并保证段与段之间至少有一个元素重叠。
+        当字典的键值对数量是segment_size的倍数时，也要保证重叠。
+
+        Args:
+        dictionary (dict): 输入的字典，其中键值对表示元素。
+        segment_size (int): 每段的元素数量。
+        overlap (int): 相邻段之间的重叠元素数量。
+
+        Returns:
+        tuple: 包含分段的列表和重叠键列表的元组，每个段以字典的形式表示。
+        """
+        segments = []
+        overlaps = []
+        keys = list(dictionary.keys())
+
+        if len(keys) < segment_size:
+            raise ValueError("Dictionary must contain at least as many keys as segment_size")
+
+        if len(keys) == segment_size:
+            return [dictionary], []
+
+        previous_segment_keys = []
+        start = 0
+        while start < len(keys):
+            # 计算下一段的结束位置，确保段与段之间有重叠
+            next_start = start + segment_size - overlap
+
+            # 如果下一段的开始位置超出字典长度，调整开始位置使得最后一段满足segment_size
+            if next_start >= len(keys) and len(keys) - start < segment_size:
+                start = len(keys) - segment_size
+
+            # 构建当前段的字典
+            current_segment = {}
+            current_overlap_keys = []
+            for i in range(start, start + segment_size):
+                key = keys[i]
+                current_segment[key] = dictionary[key]
+                # 如果当前键在上一段中出现过，则将其添加到重叠键列表中
+                if key in previous_segment_keys:
+                    current_overlap_keys.append(key)
+
+            segments.append(current_segment)
+            overlaps.append(current_overlap_keys)
+            previous_segment_keys = keys[start : start + segment_size]
+            start = next_start
+
+        return segments, overlaps
+
+    def transform_region_condi_list(region_condi_list):
+        transformed_list = []
+
+        for region_dict in region_condi_list:
+            if "prompt_map" in region_dict and isinstance(region_dict["prompt_map"], dict):
+                new_region_dict = {"prompt_map": {}}
+                prompt_map = region_dict["prompt_map"]
+
+                # 从1到15的键中复制值
+                for i in range(1, 16):
+                    if 0 in prompt_map:
+                        new_region_dict["prompt_map"][i] = prompt_map[0]
+                    else:
+                        new_region_dict["prompt_map"][i] = None
+
+                # 复制其他键的值
+                for key, value in region_dict.items():
+                    if key != "prompt_map":
+                        new_region_dict[key] = value
+
+                # 添加到转换后的列表
+                transformed_list.append(new_region_dict)
+            else:
+                # 如果没有有效的 'prompt_map'，直接复制当前字典
+                transformed_list.append(region_dict)
+
+        return transformed_list
+
+    # context_frames 默认为16
+    pipeline_outputs = []
+
+    for i, c in enumerate(controlnet_image_maps):
+        new_region_condi_list = transform_region_condi_list(region_condi_list)
+        example_callback_with_i = partial(example_callback, i)
+
+        pipeline_output = pipeline(
+            negative_prompt=n_prompt,
+            num_inference_steps=steps,
+            guidance_scale=guidance_scale,
+            unet_batch_size=unet_batch_size,
+            width=width,
+            height=height,
+            video_length=context_frames,
+            return_dict=False,
+            context_frames=context_frames,
+            context_stride=context_stride + 1,
+            context_overlap=context_overlap,
+            context_schedule=context_schedule,
+            clip_skip=clip_skip,
+            controlnet_type_map=controlnet_type_map,
+            controlnet_image_map=c,
+            controlnet_ref_map=controlnet_ref_map,
+            controlnet_max_samples_on_vram=controlnet_map["max_samples_on_vram"]
+            if "max_samples_on_vram" in controlnet_map
+            else 999,
+            controlnet_max_models_on_vram=controlnet_map["max_models_on_vram"]
+            if "max_models_on_vram" in controlnet_map
+            else 99,
+            controlnet_is_loop=controlnet_map["is_loop"] if "is_loop" in controlnet_map else True,
+            img2img_map=img2img_map,
+            ip_adapter_config_map=ip_adapter_config_map,
+            region_list=region_list,
+            region_condi_list=new_region_condi_list,
+            interpolation_factor=1,
+            is_single_prompt_mode=is_single_prompt_mode,
+            callback=example_callback_with_i,
+        )
+        pipeline_outputs.append(pipeline_output)
+
+    def combine_videos(videos):
+        """
+        合并多个视频。
+
+        Args:
+        videos (list): 包含多个视频的列表，每个视频可以是PyTorch张量或NumPy数组。
+
+        Returns:
+        Union[torch.Tensor, np.ndarray]: 合并后的视频，数据类型与输入视频相同。
+        """
+        # 先不考虑重复帧，先简单处理一下
+
+        # 确定输入视频的数据类型
+        if isinstance(videos[0], torch.Tensor):
+            combined_video = torch.cat(videos, dim=2)
+        elif isinstance(videos[0], np.ndarray):
+            combined_video = np.concatenate(videos, axis=2)
+        else:
+            raise ValueError("Unsupported data type for videos")
+
+        return combined_video
+
+    videos = [output.videos for output in pipeline_outputs]
+    combined_videos_res = combine_videos(videos)
+    pipeline_output = AnimationPipelineOutput(videos=combined_videos_res)
 
     logger.info("Generation complete, saving...")
 
