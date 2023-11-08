@@ -1240,13 +1240,9 @@ def run_inference(
     latents_cache = {}
 
     controlnet_image_maps, overlaps = segment_dict(
-        controlnet_image_map, segment_size=context_frames, overlap=8
+        controlnet_image_map, segment_size=context_frames, overlap=1
     )
-    print(
-        "overlaps=",
-        overlaps,
-        # "|controlnet_image_maps=",
-    )
+    print("overlaps=", overlaps, "|controlnet_image_maps=", controlnet_image_maps)
 
     def example_callback(idx, iteration, t, latents):
         # 确保 idx 存在于 latents_cache
