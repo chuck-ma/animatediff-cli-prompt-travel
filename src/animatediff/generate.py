@@ -1233,7 +1233,7 @@ def run_inference(
             overlaps.append(current_overlap_keys)
             previous_segment_keys = keys[start : start + segment_size]
 
-            if (start + segment_size) > len(keys):
+            if (start + segment_size) >= len(keys):
                 break
             start = next_start
 
