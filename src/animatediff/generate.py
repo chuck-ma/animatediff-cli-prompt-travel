@@ -1216,7 +1216,9 @@ def run_inference(
             next_start = start + segment_size - overlap
 
             # 如果下一段的开始位置超出字典长度，调整开始位置使得最后一段满足segment_size
-            if next_start >= len(keys) and len(keys) - start < segment_size:
+            if (next_start >= len(keys) and len(keys) - start < segment_size) or (
+                (start + segment_size) > len(keys)
+            ):
                 start = len(keys) - segment_size
 
             # 构建当前段的字典
