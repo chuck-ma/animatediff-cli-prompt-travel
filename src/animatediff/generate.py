@@ -1202,7 +1202,7 @@ def run_inference(
 
         # 看代码 video 是 numpy 类型，先转一下
         temp_video_res = torch.from_numpy(temp_video)
-        output_directory = f"./output_tmp2/{iteration}_{t}"
+        output_directory = f"./output_tmp2/{idx}_{iteration}_{t}"
         save_frames(temp_video_res, output_directory, False)
 
         if idx > 0:
