@@ -1328,7 +1328,7 @@ def run_inference(
             is_single_prompt_mode=is_single_prompt_mode,
             callback=example_callback_with_i,
         )
-        pipeline_outputs.append(pipeline_output)
+        pipeline_outputs.append(pipeline_output.videos)
 
     def combine_videos(videos):
         """
@@ -1352,8 +1352,8 @@ def run_inference(
 
         return combined_video
 
-    videos = [output.videos for output in pipeline_outputs]
-    combined_videos_res = combine_videos(videos)
+    print("pipeline_outputs=", pipeline_outputs)
+    combined_videos_res = combine_videos(pipeline_outputs)
     pipeline_output = AnimationPipelineOutput(videos=combined_videos_res)
 
     logger.info("Generation complete, saving...")
