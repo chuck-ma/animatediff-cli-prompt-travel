@@ -1330,7 +1330,7 @@ def run_inference(
             callback=example_callback_with_i,
         )
         print("pipeline_output=", pipeline_output)
-        pipeline_outputs.append(pipeline_output.videos)
+        pipeline_outputs.append(pipeline_output)
 
     def combine_videos(videos, overlaps):
         """
