@@ -1240,7 +1240,7 @@ def run_inference(
     latents_cache = {}
 
     controlnet_image_maps, overlaps = segment_dict(
-        controlnet_image_map, segment_size=context_frames, overlap=1
+        controlnet_image_map, segment_size=context_frames, overlap=8
     )
     print("overlaps=", overlaps, "|controlnet_image_maps=", controlnet_image_maps)
 
