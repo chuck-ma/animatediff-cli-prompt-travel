@@ -1186,7 +1186,7 @@ def run_inference(
 
     # 先不管 img2img_map 和 ip_adapter_config_map 这样的实现了
 
-    def segment_dict(dictionary, segment_size=16, overlap=1):
+    def segment_dict(dictionary, segment_size=16, overlap=15):
         """
         分段给定字典，每段大小为segment_size，并保证段与段之间至少有一个元素重叠。
         当字典的键值对数量是segment_size的倍数时，也要保证重叠。
@@ -1242,7 +1242,7 @@ def run_inference(
     controlnet_image_maps, overlaps = segment_dict(
         controlnet_image_map, segment_size=context_frames, overlap=1
     )
-    print("overlaps=", overlaps)
+    print("overlaps=", overlaps, "|controlnet_image_maps=", controlnet_image_maps)
 
     def example_callback(idx, iteration, t, latents):
         # 确保 idx 存在于 latents_cache
