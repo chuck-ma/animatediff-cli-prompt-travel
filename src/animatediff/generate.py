@@ -1251,17 +1251,18 @@ def run_inference(
         # "|controlnet_image_maps=", controlnet_image_maps
     )
 
-    def example_callback(idx, iteration, t, latents):
+    def example_callback(idx, iteration, t, latents, debug=False):
         # 确保 idx 存在于 latents_cache
         if idx not in latents_cache:
             latents_cache[idx] = {}
         latents_cache[idx][iteration] = latents
-        temp_video = pipeline.decode_latents(latents)
+        if debug:
+            temp_video = pipeline.decode_latents(latents)
 
-        # 看代码 video 是 numpy 类型，先转一下
-        temp_video_res = torch.from_numpy(temp_video)
-        output_directory = f"./output_tmp2/{idx}_{iteration}_{t}"
-        save_frames(temp_video_res, output_directory, False)
+            # 看代码 video 是 numpy 类型，先转一下
+            temp_video_res = torch.from_numpy(temp_video)
+            output_directory = f"./output_tmp2/{idx}_{iteration}_{t}"
+            save_frames(temp_video_res, output_directory, False)
 
         if idx > 0:
             for i, _ in enumerate(overlaps[idx]):
