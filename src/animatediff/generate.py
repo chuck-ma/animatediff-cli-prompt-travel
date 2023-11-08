@@ -1346,10 +1346,16 @@ def run_inference(
 
         # 确定输入视频的数据类型
         if isinstance(videos[0], torch.Tensor):
-            # for i, video in enumerate(videos):
-            #     if i == 0
+            for i, video in enumerate(videos):
+                if i == 0:
+                    combined_video = video
+                else:
+                    slice_length = len(overlaps[i])
+                    video_sliced = video[:, :, slice_length:, :, :]
 
-            combined_video = torch.cat(videos, dim=2)
+                    combined_video = torch.cat((combined_video, video_sliced), dim=2)
+
+            # combined_video = torch.cat(videos, dim=2)
         elif isinstance(videos[0], np.ndarray):
             combined_video = np.concatenate(videos, axis=2)
         else:
