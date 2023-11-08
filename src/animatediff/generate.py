@@ -1242,6 +1242,7 @@ def run_inference(
     controlnet_image_maps, overlaps = segment_dict(
         controlnet_image_map, segment_size=context_frames, overlap=1
     )
+    print("overlaps=", overlaps)
 
     def example_callback(idx, iteration, t, latents):
         # 确保 idx 存在于 latents_cache
@@ -1328,9 +1329,10 @@ def run_inference(
             is_single_prompt_mode=is_single_prompt_mode,
             callback=example_callback_with_i,
         )
+        print("pipeline_output=", pipeline_output)
         pipeline_outputs.append(pipeline_output.videos)
 
-    def combine_videos(videos):
+    def combine_videos(videos, overlaps):
         """
         合并多个视频。
 
@@ -1353,7 +1355,7 @@ def run_inference(
         return combined_video
 
     print("pipeline_outputs=", pipeline_outputs)
-    combined_videos_res = combine_videos(pipeline_outputs)
+    combined_videos_res = combine_videos(pipeline_outputs, overlaps)
     pipeline_output = AnimationPipelineOutput(videos=combined_videos_res)
 
     logger.info("Generation complete, saving...")
