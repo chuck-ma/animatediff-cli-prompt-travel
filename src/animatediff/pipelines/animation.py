@@ -2890,9 +2890,9 @@ class AnimationPipeline(DiffusionPipeline, TextualInversionLoaderMixin):
                     # ,context_frames=16, context_stride=1, context_overlap=4
                     # context 为 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 
-                    print(
-                        f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}, context={context}"
-                    )
+                    # print(
+                    #     f"context_scheduler|i={i}, num_inference_steps={num_inference_steps}, shape={latents.shape},context_frames={context_frames}, context_stride={context_stride}, context_overlap={context_overlap}, context={context}"
+                    # )
 
                     if controlnet_image_map:
                         controlnet_target = (
