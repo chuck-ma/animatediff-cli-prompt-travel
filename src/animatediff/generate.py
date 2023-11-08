@@ -1186,31 +1186,6 @@ def run_inference(
 
     # 先不管 img2img_map 和 ip_adapter_config_map 这样的实现了
 
-    # 简便起见， 直接把 region_condi_list 的 key都做一个 copy and paste
-    latents_cache = {}
-
-    controlnet_image_maps, overlaps = segment_dict(
-        controlnet_image_map, segment_size=context_frames, overlap=1
-    )
-
-    def example_callback(idx, iteration, t, latents):
-        # 确保 idx 存在于 latents_cache
-        if idx not in latents_cache:
-            latents_cache[idx] = {}
-        latents_cache[idx][iteration] = latents
-        temp_video = pipeline.decode_latents(latents)
-
-        # 看代码 video 是 numpy 类型，先转一下
-        temp_video_res = torch.from_numpy(temp_video)
-        output_directory = f"./output_tmp2/{idx}_{iteration}_{t}"
-        save_frames(temp_video_res, output_directory, False)
-
-        if idx > 0:
-            for i, _ in enumerate(overlaps[idx]):
-                last_latents = latents_cache[idx - 1][iteration]
-                last_idx = latents.shape[2] - len(overlaps[idx]) + i
-                latents[:, :, i, :, :] = last_latents[:, :, last_idx, :, :]
-
     def segment_dict(dictionary, segment_size=16, overlap=1):
         """
         分段给定字典，每段大小为segment_size，并保证段与段之间至少有一个元素重叠。
@@ -1260,6 +1235,31 @@ def run_inference(
             start = next_start
 
         return segments, overlaps
+
+    # 简便起见， 直接把 region_condi_list 的 key都做一个 copy and paste
+    latents_cache = {}
+
+    controlnet_image_maps, overlaps = segment_dict(
+        controlnet_image_map, segment_size=context_frames, overlap=1
+    )
+
+    def example_callback(idx, iteration, t, latents):
+        # 确保 idx 存在于 latents_cache
+        if idx not in latents_cache:
+            latents_cache[idx] = {}
+        latents_cache[idx][iteration] = latents
+        temp_video = pipeline.decode_latents(latents)
+
+        # 看代码 video 是 numpy 类型，先转一下
+        temp_video_res = torch.from_numpy(temp_video)
+        output_directory = f"./output_tmp2/{idx}_{iteration}_{t}"
+        save_frames(temp_video_res, output_directory, False)
+
+        if idx > 0:
+            for i, _ in enumerate(overlaps[idx]):
+                last_latents = latents_cache[idx - 1][iteration]
+                last_idx = latents.shape[2] - len(overlaps[idx]) + i
+                latents[:, :, i, :, :] = last_latents[:, :, last_idx, :, :]
 
     def transform_region_condi_list(region_condi_list):
         transformed_list = []
