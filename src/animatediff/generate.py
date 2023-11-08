@@ -1329,7 +1329,7 @@ def run_inference(
             is_single_prompt_mode=is_single_prompt_mode,
             callback=example_callback_with_i,
         )
-        print("pipeline_output=", pipeline_output)
+        # print("pipeline_output=", pipeline_output)
         pipeline_outputs.append(pipeline_output)
 
     def combine_videos(videos, overlaps):
@@ -1347,6 +1347,7 @@ def run_inference(
         # 确定输入视频的数据类型
         if isinstance(videos[0], torch.Tensor):
             # for i, video in enumerate(videos):
+            #     if i == 0
 
             combined_video = torch.cat(videos, dim=2)
         elif isinstance(videos[0], np.ndarray):
