@@ -1186,7 +1186,7 @@ def run_inference(
 
     # 先不管 img2img_map 和 ip_adapter_config_map 这样的实现了
 
-    def segment_dict(dictionary, segment_size=16, overlap=2):
+    def segment_dict(dictionary, segment_size=16, overlap=1):
         """
         分段给定字典，每段大小为segment_size，并保证段与段之间至少有一个元素重叠。
         当字典的键值对数量是segment_size的倍数时，也要保证重叠。
