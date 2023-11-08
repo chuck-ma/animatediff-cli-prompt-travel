@@ -1346,6 +1346,8 @@ def run_inference(
 
         # 确定输入视频的数据类型
         if isinstance(videos[0], torch.Tensor):
+            # for i, video in enumerate(videos):
+
             combined_video = torch.cat(videos, dim=2)
         elif isinstance(videos[0], np.ndarray):
             combined_video = np.concatenate(videos, axis=2)
@@ -1354,9 +1356,9 @@ def run_inference(
 
         return combined_video
 
-    print("pipeline_outputs=", pipeline_outputs)
-    combined_videos_res = combine_videos(pipeline_outputs, overlaps)
-    pipeline_output = AnimationPipelineOutput(videos=combined_videos_res)
+    # print("pipeline_outputs=", pipeline_outputs)
+    pipeline_output = combine_videos(pipeline_outputs, overlaps)
+    # pipeline_output = AnimationPipelineOutput(videos=combined_videos_res)
 
     logger.info("Generation complete, saving...")
 
