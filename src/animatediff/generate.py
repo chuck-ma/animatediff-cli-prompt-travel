@@ -1216,9 +1216,7 @@ def run_inference(
             next_start = start + segment_size - overlap
 
             # 如果下一段的开始位置超出字典长度，调整开始位置使得最后一段满足segment_size
-            if (next_start >= len(keys) and len(keys) - start < segment_size) or (
-                (start + segment_size) > len(keys)
-            ):
+            if len(keys) - start < segment_size:
                 start = len(keys) - segment_size
 
             # 构建当前段的字典
@@ -1234,6 +1232,9 @@ def run_inference(
             segments.append(current_segment)
             overlaps.append(current_overlap_keys)
             previous_segment_keys = keys[start : start + segment_size]
+
+            if (start + segment_size) > len(keys):
+                break
             start = next_start
 
         return segments, overlaps
